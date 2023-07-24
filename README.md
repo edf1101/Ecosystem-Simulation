@@ -1,5 +1,7 @@
 # Ecosystem-Simulation
 
+![image](https://github.com/efdev01/Ecosystem-Simulation/assets/96292907/1cf5c686-ca48-4198-98de-3dd2ecf50d2b)
+
 This was my Computer Science A Level NEA.
 I created a 200m*200m map featuring multiple biomes, terrain types and water features in a procedurally generated low poly map using:
 - Poisson Disk sampling
