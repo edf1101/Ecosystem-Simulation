@@ -2,10 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// this is used to get the grid at the start of what is walkable etc and create a node array from it.
-// inspired from Seb Lague A* tutorial although very heavily modified for weighting and particular focus on 3D environments
-// implementation into my environment also unique
-
 public class Grid : MonoBehaviour
 {
 
@@ -18,22 +14,31 @@ public class Grid : MonoBehaviour
  public   Node[,] grid;
     public Node[,] waterGrid;
     public Vector2 gridWorldSize;
+    public float nodeRadius;
+    //  public LayerMask unwalkableMask;
     [SerializeField] bool dispGizmos;
     float nodeDiameter;
-    int gridSizeX = 250;
-        int gridSizeY=250;
+    int gridSizeX,gridSizeY;
     [SerializeField] PlacementManager availiblesPM;
     public Texture2D canWalk;
     [SerializeField] waterPlaces WP;
-    public void gridInit() // gets called in load manager
+    public void gridInit()
     {
+        
         createWeightMap();
+        nodeDiameter = nodeRadius * 2;
+        gridSizeX = Mathf.RoundToInt(  gridWorldSize.x / nodeDiameter);
+        gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         createGrid();
 
     }
 
-   
-    void createWeightMap() // creates the weight map for nodes by looking at gradient of each point
+    void createWaterWalk()
+    {
+        waterGridTex = new Texture2D(250, 250);
+
+    }
+    void createWeightMap()
     {
         weights = new Texture2D(250, 250);
         Mesh mesh = TG.mesh;
@@ -65,7 +70,7 @@ public class Grid : MonoBehaviour
         }
         weights.Apply();
     }
-    void createGrid() // create the grid of nodes based on what we learnt in weights and Placement manager availible maps
+    void createGrid()
     {
         canWalk = new Texture2D(250, 250);
         Texture2D availibles = availiblesPM.movAv2;
@@ -79,14 +84,17 @@ public class Grid : MonoBehaviour
                 int penalty = (int)(40* weights.GetPixel(x,y).r);
                 Vector3 WorldPos=new Vector3(x,0,y);    
                 bool walkable=availibles.GetPixel(x,y)!=Color.black;
+//bool Watwalkable=availibles.GetPixel(x,y)!=Color.black || WP.nearWater.GetPixel(x, y) != Color.black;
+                //bool walkabke=availibles.GetPixel(x,)
                 grid[x, y] = new Node(walkable, WorldPos,x,y,penalty);
                 waterGrid[x, y] = new Node(walkable, WorldPos,x,y,penalty);
+                //waterGrid[x]
                 canWalk.SetPixel(x,y,grid[x,y].walkable?Color.yellow:Color.black);
             }
         }
         canWalk.Apply();
     }
-    public Node nodeFromWorld(Vector3 worldPos) // get a node from a point in the world
+    public Node nodeFromWorld(Vector3 worldPos)
     {
         
         int x = Mathf.RoundToInt(worldPos.x);
@@ -94,8 +102,26 @@ public class Grid : MonoBehaviour
         return grid[x, y];
     }
 
+    public Node nearestNode(Node currentPos)
+    {
+        for(int x = Mathf.Max(0, currentPos.gridX-2); x < Mathf.Min(250, currentPos.gridX+2);x++)
+        {
 
-    public Node[] getNeighbours(Node node) // get the neighbours of a node
+            for (int y = Mathf.Max(0, currentPos.gridY-2); y < Mathf.Min(250, currentPos.gridY+2); y++)
+            {
+                if(  grid[x,y].walkable)
+                {
+                    return grid[x,y];
+                }
+
+
+            }
+
+        }
+        return null;
+    }
+
+    public Node[] getNeighbours(Node node)
     {
         int arrSize = 8;
         if ((node.gridX == 249 || node.gridX == 0) && !(node.gridY == 249 || node.gridY == 0))
@@ -105,6 +131,7 @@ public class Grid : MonoBehaviour
         if ((node.gridX == 249 || node.gridX == 0) && (node.gridY == 249 || node.gridY == 0))
             arrSize = 3;
         Node[] neighbours = new Node[arrSize];
+        // List<Node> neighbours = new List< Node>();
         int count = 0;
         for(int x=-1; x <= 1; x++)
         {
@@ -123,10 +150,14 @@ public class Grid : MonoBehaviour
         }
      
         return neighbours;
+       // return neighbours;
     }
     
 
-    
+    public int MaxSize
+    {
+        get { return gridSizeX*gridSizeY; }
+    }
 
   
 }

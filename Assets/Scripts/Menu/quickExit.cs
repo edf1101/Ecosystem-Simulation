@@ -1,7 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class quickExit : MonoBehaviour // simple script to go to main menu when click exit button in simulation pause menu
+public class quickExit : MonoBehaviour
 {
         
    public void exitNow() { SceneManager.LoadScene("Menu"); }

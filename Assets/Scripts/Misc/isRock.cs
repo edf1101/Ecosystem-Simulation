@@ -1,6 +1,18 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class isRock : MonoBehaviour // this simply gets attatched to a gameObject so I can use GetComponent<isRock>() to find out if an object is a rock or not
-    // could have used tags but didnt know how to use them at the time of writing this originally
+public class isRock : MonoBehaviour
 {
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class menuManager : MonoBehaviour // this manages the gameplay menu
+public class menuManager : MonoBehaviour
 {
-    
+    // Start is called before the first frame update
     public bool menuOut=true;
     public timeController TC;
     //  public fly Fly;
@@ -13,13 +13,13 @@ public class menuManager : MonoBehaviour // this manages the gameplay menu
     float menuX = -532;
     int going = 0;
     public RectTransform holder;
-    public playerController PC;
+    public fly FL;
     [SerializeField] statsManager SM;
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("Menu")&&!PC.Spectating) // stuff to lock mouse if menu in/ out
+        if (Input.GetButtonDown("Menu")&&!FL.Spectating)
         {
             if (menuOut)
             {
@@ -41,7 +41,7 @@ public class menuManager : MonoBehaviour // this manages the gameplay menu
             }
 
         }
-        if (going == 1) // lerps the menu position in and out of screen so smooth
+        if (going == 1)
         {
             menuX += 6000 * Time.deltaTime;
             if (menuX >= 0)
@@ -62,7 +62,7 @@ public class menuManager : MonoBehaviour // this manages the gameplay menu
             holder.localPosition = new Vector3(menuX, 0, 0);
         }
     }
-    public void quit() // funcs below get mapped to buttons ie quit button start scrren button 
+    public void quit()
     {
         Application.Quit();
     }
@@ -80,7 +80,7 @@ public class menuManager : MonoBehaviour // this manages the gameplay menu
             StartCoroutine(waitToStats());
         }
     }
-    IEnumerator waitToStats() // IENumerator so U wait 2s before going to stats menu so the StatisticsManager has time to create csv file
+    IEnumerator waitToStats()
     {
         yield return new WaitForSeconds(2);
         SceneManager.LoadScene("Stats");

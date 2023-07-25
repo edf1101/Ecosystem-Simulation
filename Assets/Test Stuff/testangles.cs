@@ -4,16 +4,12 @@ using UnityEngine;
 
 public class testangles : MonoBehaviour
 {
-
-    public SortedList<int, string> test = new SortedList<int, string>();
-
     // Start is called before the first frame update
     public GameObject target;
     public float ang;
     void Start()
     {
-        test.Add(2, "hi");
-       
+        
     }
 
     // Update is called once per frame

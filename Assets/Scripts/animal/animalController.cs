@@ -1,12 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq; //library with lots of nice functions
-
-
+using System.Linq;
 public class animalController : MonoBehaviour
 {
-    // define important variables up here
     public Transform effectsLoc;
     public string speciesName;
     public timeController TC;
@@ -82,8 +79,6 @@ public class animalController : MonoBehaviour
     public GameObject myMate;
     public Vector3 mateSpot;
     float lastMateTry;
-
-    // struct to hold which ppl I have harrassed and when - so I can stop chasing after a while
     public class Harrass
     {
         public float time;
@@ -107,9 +102,7 @@ public class animalController : MonoBehaviour
     public float depSlow = 1f;
     float myChance1;
     public float reproducability = 1;
-
-
-    public void myStart() // seperate function for mystart so I have a bit more control
+    public void myStart()
     {
         //baseSpeed = speed;
         harrassList = new List<Harrass>();
@@ -128,17 +121,17 @@ public class animalController : MonoBehaviour
     public populationManager PM;
 
     // Update is called once per frame
-    void Update() 
+    void Update()
     {
         if (started)
         {
             myChance1 = PM.Getchance1(speciesName);
-            if (alive && Time.time - lastTime > 0.1f) // only run if im still alive
+            if (alive && Time.time - lastTime > 0.1f)
             {
                 if (followingWho == null && following)
                     following = false;
                 // BASE CHANGES
-                if (following) // if im following someone slow down a little to make it fair
+                if (following)
                     speed = (followingWho.GetComponent<animalController>().speed * TC.multiplier) * 0.9f;
                 else
                     speed = baseSpeed * TC.multiplier;
@@ -146,7 +139,7 @@ public class animalController : MonoBehaviour
                 GetComponent<Animator>().speed = aniBaseSpeed * TC.multiplier;
                 float dT = Time.time - lastTime;
                 lastTime = Time.time;
-                age = TC.timeHours - startHours + GetComponent<AnimalCreator>().age; // do things like food depreciating aging etc
+                age = TC.timeHours - startHours + GetComponent<AnimalCreator>().age;
                 hunger -= (dT * TC.speed * TC.multiplier * hungerDepreciation * depSlow);
                 thirst -= (dT * TC.speed * TC.multiplier * thirstDepreciation * depSlow);
                 if (thirst < 0)
@@ -214,7 +207,7 @@ public class animalController : MonoBehaviour
 
                      }
 
-                    if (((myTemp > minTemp && myTemp < maxTemp) || !canNicerConditions)&& canChild!=2) // move if in biome that is too hot/ cold
+                    if (((myTemp > minTemp && myTemp < maxTemp) || !canNicerConditions)&& canChild!=2)
                     //if ( canChild!=2)
                     {
                         temp = findRoam();
@@ -231,7 +224,7 @@ public class animalController : MonoBehaviour
 
 
                 }
-                if (badSpot && !( canChild==2)&&Time.time-lastMoveAttempt>1.5f) // do a cheap move if im not in an A* movable position
+                if (badSpot && !( canChild==2)&&Time.time-lastMoveAttempt>1.5f)
                 {
                     lastMoveAttempt = Time.time;
                     if (debug)
@@ -292,7 +285,17 @@ public class animalController : MonoBehaviour
                     }
 
                 }
-               
+                /*
+                // move to nicer conditions
+                if((myTemp<minTemp || myTemp>maxTemp) && !MoveScript.moving)
+                {
+
+
+
+
+
+                }
+                */
 
 
                 //hunting
@@ -400,7 +403,12 @@ public class animalController : MonoBehaviour
                 {
                     canChild = 0;
                 }
-              
+                /*if (myMate == null)
+                {
+                    myMate = null;
+                    canChild = 0;
+
+                }*/
                 if (canChild == 2&&male)
                 {
 
@@ -531,7 +539,32 @@ public class animalController : MonoBehaviour
                 }
 
 
-            
+                /*
+                //overpopulation/*
+                if (Time.time - lastOver > 2 && canChild == 0)
+                {
+                    lastOver = Time.time;
+                    Collider[] collisions = Physics.OverlapSphere(transform.position, 3);
+                    int amount = 0;
+                    foreach (Collider col in collisions)
+                    {
+                        if (col.GetComponentInParent<animalController>() != null)// if it is an animal
+                        {
+
+                            amount++;
+
+
+                        }
+
+                    }
+                    if (amount > 6)
+                    {
+                        Vector3 temp = findFar();
+                        if (temp!=Vector3.zero)
+                         MoveScript.moveTo(new Vector3(temp.x,0,temp.y), 1);
+                    }
+
+                }*/
             }
 
 
@@ -545,7 +578,7 @@ public class animalController : MonoBehaviour
     }
 
 
-    IEnumerator removeMate() // this gets called after having a child 
+    IEnumerator removeMate()
     {
         yield return new WaitForSeconds(2);
 
@@ -559,8 +592,10 @@ public class animalController : MonoBehaviour
             myMate = null;
             removed = false;
         }
+        //  return null;
+
     }
-    void lostTarget()// this gets called when my target died
+    void lostTarget()
     {
         following = false;
 
@@ -568,17 +603,17 @@ public class animalController : MonoBehaviour
 
         GetComponent<animalSight>().UpdatePrey();
     }
-    bool haveIHarrassedThem(GameObject victim) // this returns whether or not I have chased after someone recently
+    bool haveIHarrassedThem(GameObject claimer)
     {
         foreach (Harrass h in harrassList)
         {
-            if (h.who == victim)
+            if (h.who == claimer)
                 return true;
 
         }
         return false;
     }
-    Vector3 findRoam() // find  a random movement place near me
+    Vector3 findRoam()
     {
 
 
@@ -595,7 +630,7 @@ public class animalController : MonoBehaviour
         else
             return Vector3.zero;
     }
-    Vector3 findFar() // find a random move place far from me
+    Vector3 findFar()
     {
 
 
@@ -615,7 +650,7 @@ public class animalController : MonoBehaviour
 
 
 
-    findFoodRet findFood() // find a random food place near me to move to
+    findFoodRet findFood()
     {
         Collider[] colls = Physics.OverlapSphere(transform.position, 20, LayerMask.GetMask("Marker"), QueryTriggerInteraction.Collide);
         float minDist = 1000;
@@ -648,7 +683,7 @@ public class animalController : MonoBehaviour
             _findWaterRet.FC = FCmin;
         return _findWaterRet;
     }
-    findWaterRet findWater1() // find a random water place near me to move to
+    findWaterRet findWater1()
     {
         Collider[] colls = Physics.OverlapSphere(transform.position, 20, LayerMask.GetMask("Marker"), QueryTriggerInteraction.Collide);
         float minDist = 1000;
@@ -673,18 +708,18 @@ public class animalController : MonoBehaviour
             _findWaterRet.watPos = pointMin.GetComponent<markerController>().nearWater;
         return _findWaterRet;
     }
-    struct findWaterRet // struct to hold nearby water poisiton
+    struct findWaterRet
     {
         public Vector3 pos;
         public Vector3 watPos;
     }
-    struct findFoodRet // struct to hold nearby food poisiton
+    struct findFoodRet
     {
         public Vector3 pos;
         public Vector3 watPos;
         public floraController FC;
     }
-    void Die() // gets called just as you die
+    void Die()
     {
         alive = false;
         foreach (GameObject follower in followers)
@@ -696,7 +731,7 @@ public class animalController : MonoBehaviour
         PM.increaseDPS(speciesName);
         Destroy(gameObject);
 
-       
+        //   StartCoroutine("fullyDie");
     }
 
 }

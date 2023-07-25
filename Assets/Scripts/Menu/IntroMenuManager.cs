@@ -1,9 +1,11 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class IntroMenuManager : MonoBehaviour // this simple script manages the UI for the intro menu scene
+public class IntroMenuManager : MonoBehaviour
 {
-    public void loadFull() // these get called on button presses ie for full load, quit button etc
+    public void loadFull()
     {
         PlayerPrefs.SetString("genMode", "Full");
         SceneManager.LoadSceneAsync("World");

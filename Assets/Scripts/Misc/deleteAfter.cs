@@ -1,7 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class deleteAfter : MonoBehaviour // this script can be attached to a temporary object so it destroys itself x seconds after being instantiated
+public class deleteAfter : MonoBehaviour
 {
+    // Start is called before the first frame update
     [SerializeField] float time;
 
     void Start()

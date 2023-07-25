@@ -5,7 +5,7 @@ using UnityEngine;
 public class DelaunayToMesh
 {
 
-    public Mesh TriangualationToMesh(Triangulation tria) // creates unity mesh out of triangulation struct
+    public Mesh TriangualationToMesh(Triangulation tria)
     {
         Mesh Mmesh = new Mesh(); // create mesh object
 
@@ -22,7 +22,7 @@ public class DelaunayToMesh
         return Mmesh;
     }
    
-    public Mesh ApplyHeight(Mesh mesh, Texture2D HM, int strength,int Offset =0) // applys height from texture to a 2d plane mesh
+    public Mesh ApplyHeight(Mesh mesh, Texture2D HM, int strength,int Offset =0)
     {
         Vector3[] vert = mesh.vertices;
         for (int i = 0;i < mesh.vertexCount; i++)

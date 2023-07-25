@@ -2,10 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-// from Seb Lague tutorial on A* pathfinding a heap is more efficient than a list of priority queue so have to use this to keep performance reasonable
-
-
-public class Heap<T> where T : IHeapItem<T> // standard heap implementation below
+public class Heap<T> where T : IHeapItem<T>
 {
 
 	T[] items;
@@ -63,15 +60,29 @@ public class Heap<T> where T : IHeapItem<T> // standard heap implementation belo
 			if (childIndexLeft < currentItemCount)
 			{
 				swapIndex = childIndexLeft;
+
 				if (childIndexRight < currentItemCount)
 				{
 					if (items[childIndexLeft].CompareTo(items[childIndexRight]) < 0)
+					{
 						swapIndex = childIndexRight;
+					}
 				}
-				if (item.CompareTo(items[swapIndex]) < 0) {Swap(item, items[swapIndex]);}
-				else{return;}
+
+				if (item.CompareTo(items[swapIndex]) < 0)
+				{
+					Swap(item, items[swapIndex]);
+				}
+				else
+				{
+					return;
+				}
+
 			}
-			else{return;}
+			else
+			{
+				return;
+			}
 
 		}
 	}
@@ -79,16 +90,23 @@ public class Heap<T> where T : IHeapItem<T> // standard heap implementation belo
 	void SortUp(T item)
 	{
 		int parentIndex = (item.HeapIndex - 1) / 2;
+
 		while (true)
 		{
 			T parentItem = items[parentIndex];
 			if (item.CompareTo(parentItem) > 0)
+			{
 				Swap(item, parentItem);
+			}
 			else
+			{
 				break;
+			}
+
 			parentIndex = (item.HeapIndex - 1) / 2;
 		}
 	}
+
 	void Swap(T itemA, T itemB)
 	{
 		items[itemA.HeapIndex] = itemB;
@@ -97,6 +115,16 @@ public class Heap<T> where T : IHeapItem<T> // standard heap implementation belo
 		itemA.HeapIndex = itemB.HeapIndex;
 		itemB.HeapIndex = itemAIndex;
 	}
+
+
+
 }
 
-public interface IHeapItem<T> : IComparable<T>  {int HeapIndex { get; set; }}
+public interface IHeapItem<T> : IComparable<T>
+{
+	int HeapIndex
+	{
+		get;
+		set;
+	}
+}

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimalCreator : MonoBehaviour // this script is used to create animals once game running ie having a child 
+public class AnimalCreator : MonoBehaviour
 {
     // public float maxModifier = 0.1f;
     public string speciesName;
@@ -54,7 +54,7 @@ public class AnimalCreator : MonoBehaviour // this script is used to create anim
         //  GetComponent<animalPath>().myStart();
         GetComponent<animalController>().myStart();
         GetComponent<glowController>().myStart();
-        GetComponent<animalEating>().myStart();
+        GetComponent<animalChomp>().myStart();
         firstSize = transform.localScale;
         firstOffset = GetComponent<animalPath>().heightOffset;
         firstSpeed = AC.baseSpeed;

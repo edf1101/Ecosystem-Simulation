@@ -12,11 +12,12 @@ class DecalMeshHelperEditor : Editor
     SerializedProperty m_strength;
     void OnEnable()
     {
-        
+        // Fetch the objects from the GameObject script to display in the inspector
+
         m_strength = serializedObject.FindProperty("strength");
     }
 
-    public override void OnInspectorGUI() // all used to test terrain gen stuff in editor
+    public override void OnInspectorGUI()
     {
         TerrainGenerator myTarget = (TerrainGenerator)target;
         GUILayout.Label(" Terrain");

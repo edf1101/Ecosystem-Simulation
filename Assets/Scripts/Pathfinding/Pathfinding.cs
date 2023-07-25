@@ -2,14 +2,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using System.Linq;
-
-// The A* algorithm came from Seb lague as hadnt covered the algorithm at time of writing and also more performant 
-//than my code which is a necessity when dealing with large( 300 calls/ s)
 
 public class Pathfinding : MonoBehaviour
 {
-	
+
 	reqManager requestManager;
 	Grid grid;
 
@@ -20,12 +16,12 @@ public class Pathfinding : MonoBehaviour
 	}
 
 
-	public void StartFindPath(Vector3 startPos, Vector3 targetPos) // gets called from reqManager to start finding a path
+	public void StartFindPath(Vector3 startPos, Vector3 targetPos)
 	{
 		StartCoroutine(FindPath(startPos, targetPos));
 	}
 
-	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos) // this gets called to find the a* path ( bulk of the algorithm)
+	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
 	{
 
 		Vector3[] waypoints = new Vector3[0];
@@ -37,7 +33,7 @@ public class Pathfinding : MonoBehaviour
 
 		if (startNode.walkable && targetNode.walkable)
 		{
-			Heap<Node> openSet = new Heap<Node>(250*250);
+			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node>();
 			openSet.Add(startNode);
 
@@ -82,7 +78,7 @@ public class Pathfinding : MonoBehaviour
 
 	}
 
-	Vector3[] RetracePath(Node startNode, Node endNode) // This goes back through the nodes to find each parent and thus a path
+	Vector3[] RetracePath(Node startNode, Node endNode)
 	{
 		List<Node> path = new List<Node>();
 		Node currentNode = endNode;
@@ -98,7 +94,7 @@ public class Pathfinding : MonoBehaviour
 
 	}
 
-	Vector3[] SimplifyPath(List<Node> path) // this removes nodes that have the same direction as prev nodes
+	Vector3[] SimplifyPath(List<Node> path)
 	{
 		List<Vector3> waypoints = new List<Vector3>();
 		Vector2 directionOld = Vector2.zero;
@@ -115,7 +111,7 @@ public class Pathfinding : MonoBehaviour
 		return waypoints.ToArray();
 	}
 
-	int GetDistance(Node nodeA, Node nodeB) // simple A* optimised distance for grid
+	int GetDistance(Node nodeA, Node nodeB)
 	{
 		int dstX = Mathf.Abs(nodeA.gridX - nodeB.gridX);
 		int dstY = Mathf.Abs(nodeA.gridY - nodeB.gridY);

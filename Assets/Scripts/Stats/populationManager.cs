@@ -1,14 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
-// this script helps to manage the populations of all animal species it monitors the population compared to the population at spawn
-// and then inflates or limits birth rates of species
-
-public class populationManager : MonoBehaviour 
+public class populationManager : MonoBehaviour
 {
-
-
     public int popCount=0;
     private float updatePeriod = 0.1f;
     float lastTime;
@@ -23,9 +17,7 @@ public class populationManager : MonoBehaviour
     public float[] animalChanges = new float[13];
     float lastPop;
     float[] origPop = new float[13];
-
-
-    void Start() // on start setup animal tracker classes for each species and put them into a dict
+    void Start()
     {
         TC = GameObject.Find("Simulation Manager").GetComponent<timeController>();
        
@@ -52,8 +44,8 @@ public class populationManager : MonoBehaviour
     
     }
 
-   
-    void doPop() // update the population of each species by counting types in the animal holder object 
+    // Update is called once per frame
+    void doPop()
     {
         for (int i = 0; i < 13; i++)
         {
@@ -68,7 +60,7 @@ public class populationManager : MonoBehaviour
     }
     void Update()
     {
-        if (TC.timeHours - lastPop > 0.2f) // update the animal trackers every .2s 
+        if (TC.timeHours - lastPop > 0.2f)
         {
             popCount = transform.childCount;
             lastPop = TC.timeHours;
@@ -93,7 +85,7 @@ public class populationManager : MonoBehaviour
         }
 
 
-        if (TC.timeHours - lastsec > 0.3f) // update populations every .3s and differents
+        if (TC.timeHours - lastsec > 0.3f)
         {
             lastsec = TC.timeHours;
            for (int i=0;i<13;i++)
@@ -113,19 +105,19 @@ public class populationManager : MonoBehaviour
     
     }
 
-   public void increaseBPS(string Species) // thjese functions are called to add to BPS DPS KPS
+   public void increaseBPS(string Species)
     {
-        animalTrackers[Species].addBPS(); // births per sec( in reality per simulatuion hour)
+        animalTrackers[Species].addBPS();
     }
-    public void increaseDPS(string Species) // deaths per sec
+    public void increaseDPS(string Species)
     {
         animalTrackers[Species].addDPS();
     }
-    public void increaseKPS(string species)//kills per sec
+    public void increaseKPS(string species)
     {
         animalTrackers[species].addKPS();
     }
-    public int getKPS(string Species)  // return a stat for animal population manager
+    public int getKPS(string Species)
     {
         return animalTrackers[Species].lastKPS;
     }
@@ -164,7 +156,7 @@ public class populationManager : MonoBehaviour
 
 
 
-public class animalTracker // this class manages and holds birth/death rates of the species
+public class animalTracker
 {
     public string species = "";
 
@@ -193,14 +185,14 @@ public class animalTracker // this class manages and holds birth/death rates of 
     public int pop;
     public float change;
 
-    public animalTracker(string _species,int _index) // class constructor
+    public animalTracker(string _species,int _index)
 
     {
         index = _index;
         species = _species;
     }
 
-    public void setupPop()// give the queues some value upon instantiation
+    public void setupPop()
     {
        
         BPavgs.Enqueue(0);
@@ -216,7 +208,7 @@ public class animalTracker // this class manages and holds birth/death rates of 
         DPavgs.Enqueue(0);
     }
 
-    public void UpdatePop(int _pop) // add value of each characteristics to the queue then take an average to get rolling number
+    public void UpdatePop(int _pop)
     {
         pop =_pop;
         BPavgs.Dequeue();
@@ -232,8 +224,7 @@ public class animalTracker // this class manages and holds birth/death rates of 
         DPS = 0;
         lastKPS = KPS;
         KPS = 0;
-        if (pop < 10 || change < 0.3) // depending on values of population deaths change% etc  change the values of probabilities on child numbers 
-            // ie chance a animal has triplets vs chance of no childeren .   can also change the range that mates can be found
+        if (pop < 10 || change < 0.3)
         {
             chance4 = 1;
             chance3 = 1f;
@@ -292,7 +283,7 @@ public class animalTracker // this class manages and holds birth/death rates of 
 
     }
 
-    public void addDPS() { DPS++; } // get called when have child or when die 
+    public void addDPS() { DPS++; }
    public void addBPS() { BPS++; }
     public void addKPS() { KPS++; }
     public float getBPS()

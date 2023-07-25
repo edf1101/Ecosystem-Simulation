@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// From Seb Lague tutorial on A* pathfinding 
 public class Node :IHeapItem<Node>
 {
     public bool walkable;
