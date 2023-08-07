@@ -1,6 +1,7 @@
 # Ecosystem-Simulation
 
-<img width="1354" alt="Screenshot 2023-08-07 at 10 56 45" src="https://github.com/edf1101/Ecosystem-Simulation/assets/96292907/cb8236fa-e272-4eca-b793-e70908e665d0">
+
+<img width="1354" alt="Screenshot 2023-08-07 at 10 56 45" src="https://github.com/edf1101/Ecosystem-Simulation/assets/96292907/6e01da93-6182-4e81-a4e0-698d3af58b16">
 
 
 This was my Computer Science A Level NEA.
