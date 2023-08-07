@@ -1,6 +1,7 @@
 # Ecosystem-Simulation
 
-![image](https://github.com/efdev01/Ecosystem-Simulation/assets/96292907/1cf5c686-ca48-4198-98de-3dd2ecf50d2b)
+<img width="1354" alt="Screenshot 2023-08-07 at 10 56 45" src="https://github.com/edf1101/Ecosystem-Simulation/assets/96292907/cb8236fa-e272-4eca-b793-e70908e665d0">
+
 
 This was my Computer Science A Level NEA.
 (Note this isnt the final version I submitted as I did a lot of refactoring and code cleanup, though the functionality is the same)
