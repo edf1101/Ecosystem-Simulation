@@ -1,23 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+
+// this script is used for setting up safe points to go to and from water
+
 
 public class waterPlaces : MonoBehaviour
 {
+
+    // Textures for defining where food and water are
     public Texture2D wheresWater;
-  public  Texture2D nearWater;
+    public  Texture2D nearWater;
     public Texture2D near2;
     public Texture2D where2;
     [SerializeField] Transform markerHolder;
     [SerializeField] GameObject markerPrefab;
     public Texture2D floraPos;
     public timeController TC;
-  public  void findWater()
+
+    // finds water over the map and puts it on a texture
+    public  void findWater()
     {
         wheresWater = new Texture2D(250, 250);
         Texture2D avs = GetComponent<animalSpawner>().availibles;
         nearWater = new Texture2D(250, 250);
         int tempcount=0;
+
+        // go through each m^2
         for (int y=0; y < 250; y++)
         {
             for (int x=0; x < 250; x++)
@@ -27,10 +35,11 @@ public class waterPlaces : MonoBehaviour
 
                 RaycastHit hit;
 
+                // draw a ray to the terrain
                 if (Physics.Raycast(new Vector3(x, 200, y), Vector3.down, out hit, Mathf.Infinity))
                 {
-                    //  Debug.DrawRay(new Vector3(pos.x, 200, pos.y), Vector3.down*10, Color.green);
-                    if (hit.collider.gameObject.layer == 4)
+                    
+                    if (hit.collider.gameObject.layer == 4)// if its water layer
                     {
                         wheresWater.SetPixel(x, y, Color.blue);
                         for(int x1 = Mathf.Max(16, x - 5); x1< Mathf.Min(234, x + 5); x1++)
@@ -41,7 +50,7 @@ public class waterPlaces : MonoBehaviour
                                 if (avs.GetPixel(x1, y1) != Color.black)
                                 {
                                     nearWater.SetPixel(x1, y1, Color.red);
-tempcount++;
+                                    tempcount++;
                                 }
                                 
                             }
@@ -138,6 +147,9 @@ tempcount++;
             }
         }
 
+
+
+
         // put flora markers on
 
 
@@ -147,10 +159,10 @@ tempcount++;
         {
             cols[i] = Color.black;
         }
-        //TC = GetComponent<timeController>();
+      
         floraPos.SetPixels(cols);
        Collider[] colls= Physics.OverlapSphere(new Vector3(125, 0, 125), 200000, LayerMask.GetMask("Flora"),QueryTriggerInteraction.Collide);
-      //  print(colls.Length);
+   
         foreach (Collider coll in colls)
         {
             int x = (int)coll.transform.position.x;

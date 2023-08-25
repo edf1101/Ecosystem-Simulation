@@ -1,9 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PoissonSampling 
 {
+
+    // return a list of poisson sampled points
    public List<Vector2> GetPoissonPoints(int numPoints,float minRad,int gridSize,int maxAttempts=1000,bool protectEdge=true)
     {
         List<Vector2> points = new List<Vector2>();
@@ -30,6 +31,7 @@ public class PoissonSampling
         return points;
     }
 
+    // check points are valid or not
     bool validatePoint(Vector2 point, List<Vector2> points,float minRad)
     {
         foreach(Vector2 p in points)
@@ -39,6 +41,8 @@ public class PoissonSampling
         }
         return true;
     }
+
+    // return poisson points in an area defined by vector2 dictionary
     public List<Vector2> getPoissoninArea(int numPoints,float minRad,Dictionary<Vector2,int> areaKeys,Dictionary<int,Vector2> area,int maxAttempts)
     {
         List<Vector2> points = new List<Vector2>();
@@ -63,6 +67,7 @@ public class PoissonSampling
         return points;
     }
 
+    // get bounds
     int[] getBounds(Dictionary<int,Vector2> areaKeys)
     {
         float minX = 1000000000;

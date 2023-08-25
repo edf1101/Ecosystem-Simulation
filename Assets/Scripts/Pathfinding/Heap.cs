@@ -1,6 +1,6 @@
-using UnityEngine;
-using System.Collections;
 using System;
+
+// Heap implementaion from Seb Lagues video on pathfinding
 
 public class Heap<T> where T : IHeapItem<T>
 {

@@ -1,26 +1,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+
+
+/*
+ * The aim of this project was to simulate an ecosystem, to do this well we dont want
+ * any populations dieing off immediately. This script artificially maintains populations
+ *  By either increasing the range of view to find mates or increasing the chance of 
+ *  having large numbers of offspring
+ * 
+ */
+
 public class populationManager : MonoBehaviour
 {
+    // total population
     public int popCount=0;
-    private float updatePeriod = 0.1f;
-    float lastTime;
   
-    public timeController TC;
+    public timeController TC; // time controller reference
     
-    Dictionary<string,animalTracker> animalTrackers=new Dictionary<string, animalTracker>();
+    private Dictionary<string,animalTracker> animalTrackers=new Dictionary<string, animalTracker>();
+
+    // arrays containing all animals species differences and populations... 
     public string[] animals;
-    float lastsec;
-    float[] animalDifs = new float[13];
+    private float lastsec;
+    private float[] animalDifs = new float[13];
     public int[] animalPops = new int[13];
     public float[] animalChanges = new float[13];
-    float lastPop;
-    float[] origPop = new float[13];
-    void Start()
+    private float lastPop;
+    private float[] origPop = new float[13];
+
+
+    private void Start()
     {
+        // get timeController 
         TC = GameObject.Find("Simulation Manager").GetComponent<timeController>();
-       
+
+        // add all the different animal trackers
         animalTrackers.Add("Arctic Fox", new animalTracker("Arctic Fox",0));
         animalTrackers.Add("Arctic Rabbit", new animalTracker("Arctic Rabbit",1));
         animalTrackers.Add("Desert Rabbit", new animalTracker("Desert Rabbit",2));
@@ -35,7 +50,8 @@ public class populationManager : MonoBehaviour
         animalTrackers.Add("Wolf", new animalTracker("Wolf",11));
         animalTrackers.Add("Camel", new animalTracker("Camel",12));
 
-   animals  =  animalTrackers.Keys.ToArray();
+        // getall the keys and set up their populatuon trackrs
+        animals  =  animalTrackers.Keys.ToArray();
         foreach (string i in animals)
         {
             animalTrackers[i].setupPop();
@@ -44,32 +60,39 @@ public class populationManager : MonoBehaviour
     
     }
 
-    // Update is called once per frame
-    void doPop()
+   
+    private void doPop()
     {
+        // set all populations to 0 
         for (int i = 0; i < 13; i++)
-        {
             animalPops[i] = 0;
-        }
+
+        // go through each animal and add them to their species populations
         Transform myT = transform;
         foreach (Transform child in myT)
-        {
             animalPops[animalTrackers[child.GetComponent<animalController>().speciesName].index]++;
 
-        }
     }
-    void Update()
+
+
+    //called once per frame
+    private void Update()
     {
-        if (TC.timeHours - lastPop > 0.2f)
+        if (TC.timeHours - lastPop > 0.2f) // update every .2secs
         {
-            popCount = transform.childCount;
+
+            popCount = transform.childCount;// update total population
+
             lastPop = TC.timeHours;
-            doPop();
+            doPop(); // update species populations
+
             if (origPop.Sum() == 0)
             {
                 for (int i = 0; i < 13; i++)
                     origPop[i] = animalPops[i];
             }
+
+            // work out the change in population ratio for each species
             for (int i = 0; i < 13; i++)
             {
                 if (origPop[i] != 0)
@@ -77,14 +100,13 @@ public class populationManager : MonoBehaviour
                     animalChanges[i] = animalPops[i] / origPop[i];
                     animalTrackers[animals[i]].pop = animalPops[i];
                     animalTrackers[animals[i]].change = animalChanges[i];
-                   // print("!");
                 }
                 else
                     animalChanges[i] = 0f;
             }
         }
 
-
+        // update the difs and pops for each species every .3 secs
         if (TC.timeHours - lastsec > 0.3f)
         {
             lastsec = TC.timeHours;
@@ -105,7 +127,8 @@ public class populationManager : MonoBehaviour
     
     }
 
-   public void increaseBPS(string Species)
+    // get and set births deaths and kills per sec for each species
+    public void increaseBPS(string Species)
     {
         animalTrackers[Species].addBPS();
     }
@@ -125,6 +148,8 @@ public class populationManager : MonoBehaviour
     {
         return animalTrackers[Species].getBPS();
     }
+
+    // get the birth inflation chances
     public float getRange(string Species)
     {
         return animalTrackers[Species].range;
@@ -155,27 +180,28 @@ public class populationManager : MonoBehaviour
 
 
 
-
+// class for tracking all the animals
 public class animalTracker
 {
     public string species = "";
 
-    int DPS;
-    Queue<float> DPavgs = new Queue<float>(5);
-    float DPaverage;
+    private int DPS; // deaths per second
+    private Queue<float> DPavgs = new Queue<float>(5);
+    private float DPaverage;
 
-    int BPS;
-    Queue<float> BPavgs = new Queue<float>(5);
-    float BPaverage;
+    private int BPS; // births per sec
+    private Queue<float> BPavgs = new Queue<float>(5);
+    private float BPaverage;
 
-    int KPS;
-   public  int lastKPS;
-    // public int population;
+    private int KPS; // kills per sec
+     public int lastKPS;
+ 
 
 
 
-    public int index;
+    public int index; // of species
 
+    // chance of having 1child  2 childs etc... 
     public float chance1;
     public float chance2;
     public float chance3;
@@ -185,6 +211,7 @@ public class animalTracker
     public int pop;
     public float change;
 
+    //constructor
     public animalTracker(string _species,int _index)
 
     {
@@ -192,6 +219,8 @@ public class animalTracker
         species = _species;
     }
 
+
+    //setup the population
     public void setupPop()
     {
        
@@ -210,6 +239,9 @@ public class animalTracker
 
     public void UpdatePop(int _pop)
     {
+
+        // work out BPS DPS average
+
         pop =_pop;
         BPavgs.Dequeue();
         BPavgs.Enqueue(BPS);
@@ -224,6 +256,9 @@ public class animalTracker
         DPS = 0;
         lastKPS = KPS;
         KPS = 0;
+
+
+        // set the chances based on total populatuons and the change between original 
         if (pop < 10 || change < 0.3)
         {
             chance4 = 1;
@@ -283,13 +318,18 @@ public class animalTracker
 
     }
 
+    // setters for death, birth/ kills per unit time
     public void addDPS() { DPS++; }
-   public void addBPS() { BPS++; }
+    public void addBPS() { BPS++; }
     public void addKPS() { KPS++; }
+
+    // getter for BPS
     public float getBPS()
     {
         return BPaverage;
     }
+
+    // get difference between births and deaths per sec average
     public float getDif { get { return BPaverage - DPaverage; } }
 
 }

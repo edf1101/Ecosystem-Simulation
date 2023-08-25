@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 
-
+// This script is just to make things look nicer in the editor and have buttons
+// to do various features
 
 [CustomEditor(typeof(TerrainGenerator))]
 class DecalMeshHelperEditor : Editor
@@ -12,8 +11,6 @@ class DecalMeshHelperEditor : Editor
     SerializedProperty m_strength;
     void OnEnable()
     {
-        // Fetch the objects from the GameObject script to display in the inspector
-
         m_strength = serializedObject.FindProperty("strength");
     }
 

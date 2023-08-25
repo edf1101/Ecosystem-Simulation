@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+// pathfinding implementation from Seb Lague's video used my own in final NEA code
+// but this was faster so Ive put his here now
+
 public class Pathfinding : MonoBehaviour
 {
 

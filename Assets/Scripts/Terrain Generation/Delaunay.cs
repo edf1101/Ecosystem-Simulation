@@ -1,14 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// Triangle class 
 public class Tri
 {
+    // use dictionaries for extra speed
     public Dictionary<int,Vector3> vert = new Dictionary<int,Vector3>();
-    //public Vector3[] vert=new Vector3[3];
-   // public List<Tri> neighbour= new List<Tri>();
     public Dictionary<int,Tri> neighbour = new Dictionary<int,Tri>();
     public Dictionary<Tri,int> neighbourkey = new Dictionary<Tri,int>();
+
     public Vector3 p0;
     public float r2;
     public Tri(Vector3 v1,Vector3 v2,Vector3 v3)
@@ -26,6 +27,7 @@ public class Tri
 
         Vector3 z = Vector3.Cross(a, b);
 
+         //calculate this maths once here 
          p0 = Vector3.Cross(Vector3.Dot(a, a) * b - Vector3.Dot(b, b) * a, z) * (0.5f / (Vector3.Dot(z, z) + 0.0000001f)) + this.vert[2];
 
          r2 = 0.25f * Vector3.Dot(a, a) * Vector3.Dot(b, b) * Vector3.Dot(a - b, a - b) / (Vector3.Dot(z, z) + 0.0000001f);
@@ -52,6 +54,7 @@ public class Tri
     }
 }
 
+// basically a simpler Vector3
 public class Point
 {
     public float x = new float();
@@ -82,6 +85,8 @@ public class Triangulation
     public Vector3[] PS;
     public int[] tris;
 }
+
+// The delaunay triangulation class
 public class Delaunay 
 {
     List<Tri> triangles=new List<Tri>();
@@ -103,13 +108,13 @@ public class Delaunay
     }
 
 
-     bool IsInCircumcircleOf(Vector3 point, Tri T)
+    private  bool IsInCircumcircleOf(Vector3 point, Tri T)
     {
        
         return Vector3.Dot(point - T.p0, point - T.p0) <= T.r2;
     }
    
-    Bound[] Boundary(List<Tri> bads)
+    private Bound[] Boundary(List<Tri> bads)
     {
         Tri T = bads[0];
         int edge = 0;
@@ -124,27 +129,22 @@ public class Delaunay
             {
                 if (bounds[0].v1 == bounds[bounds.Count-1].v1 && bounds[0].v2 == bounds[bounds.Count - 1].v2 && bounds[0].tri == bounds[bounds.Count - 1].tri)
                 {
-             //       Debug.Log("done");
+
                     break;
                 }
             }
-           // Debug.Log("P");
-            //  Debug.Log(attempts);
-         //   Debug.Log(bounds.ToString());
-          //  Debug.Log("BL");
-          //  Debug.Log(bounds.Count);
+
             if (bads.Contains(T.neighbour[edge]))
             {
                Tri last = T;
                 T=T.neighbour[edge];
                // T.neighbour.val
                 edge = (T.neighbourkey[last] + 1) % 3;
-              //  Debug.Log(edge);
-              //  break;
+
             }
             else
             {//
-              //  Debug.Log("FOUND");
+
                 Bound tempv=new Bound();
                tempv.v1=(T.vert[(edge+1) % 3]);
                 tempv.v2=(T.vert[(edge + 2) % 3]);
@@ -152,8 +152,6 @@ public class Delaunay
                 bounds.Add(bounds.Count,tempv);
                 edge=(edge+1)%3;
                 
-
-              
             }
         }
         int temp1 = bounds.Count - 1;
@@ -168,6 +166,7 @@ public class Delaunay
 
     }
 
+    // Add a point into the triangulation
     void AddPoint(Vector3 p)
     {
         List<Tri> bads = new List<Tri>();
@@ -228,6 +227,7 @@ public class Delaunay
         
     }
 
+    // triangulate the points this is what gets called publically
     public Triangulation Triangulate(List<int> xs, List<int> ys)
     {
         for (int i = 0;i < xs.Count; i++)

@@ -1,22 +1,24 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// this script calls all the functions to build terrain its also got lots
+// of functions for debugging that can be run in editor
 public class TerrainGenerator : MonoBehaviour
 {
-    // Start is called before the first frame update
+
     public Texture2D finalPerlin;
-    NoiseGen NG;
+    private NoiseGen NG;
    public Vector2[] points;
     public Mesh mesh;
     public int strength;
     public Mesh triangulatedMesh;
     public Triangulation TL;
     public SeaScript SG;
-  //  bool fromScratch = false;
+
 
    
-
+    // generate terrain from scratch
     public void generateTerrain()
     {
         GenerateNoise();
@@ -30,11 +32,11 @@ public class TerrainGenerator : MonoBehaviour
         addTrees();
         addFlowers();
     }
+
+    // generate terrain using premade delaunay 2d plane
     public void partialGenerateTerrain()
     {
         GenerateNoise();
-       // GenExpensivePoints();
-        //TriangulateMesh();
         ApplyHeight();
         createRivers();
         createBiomes();
@@ -43,6 +45,9 @@ public class TerrainGenerator : MonoBehaviour
         addTrees();
         addFlowers();
     }
+
+
+    // functions for various stages of terrain generation
     public void addTrees()
     {
         GetComponent<PlacementManager>().addTrees();

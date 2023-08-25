@@ -1,6 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+
+// This does a box blur on the texture given
+// Not what I used in my final NEA I used a compute shader guassian blur
+// similar to my terrain gen v2 script
 
 class LinearBlur
     {
@@ -29,13 +32,15 @@ class LinearBlur
  
             return tex;
         }
- 
+
+    // do a 1D blur
         private Texture2D OneDimensialBlur(Texture2D image, int radius, bool horizontal)
         {
             _sourceImage = image;
  
             var blurred = new Texture2D(image.width, image.height, image.format, false);
- 
+
+            // blur horizonrally
             if (horizontal)
             {
                 for (int imgY = 0; imgY < _sourceHeight; ++imgY)
@@ -60,7 +65,8 @@ class LinearBlur
                     }
                 }
             }
- 
+
+                // blur vertically
             else
             {
                 for (int imgX = 0; imgX < _sourceWidth; imgX++)
@@ -89,7 +95,8 @@ class LinearBlur
             blurred.Apply();
             return blurred;
         }
- 
+
+
         private Color GetPixelWithXCheck(int x, int y)
         {
             if (x <= 0) return _sourceImage.GetPixel(0, y);

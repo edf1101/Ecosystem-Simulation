@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -17,10 +15,10 @@ public class NoiseGen : MonoBehaviour
     public Texture2D riv2;
     public MapRating MR;
     public Texture2D riv3;
-   // public Texture2D fallOff;
 
 
 
+    // rate each map for % of water % of mountains 
    [System.Serializable]
     public class MapRating
     {
@@ -28,27 +26,38 @@ public class NoiseGen : MonoBehaviour
         public float highPer;
         public float maxed;
     }
-   
+
+    // create the map 
     public void createMap()
     {
+        // use 1000x1000 so its 4x points per m
         rivers = new Texture2D(1000, 1000);
         riv2= new Texture2D(1000, 1000);
         riv3 = new Texture2D(1000, 1000);
-        //   fallOff = makeFalloff();
+
+        // create perlin and river maps then apply falloffs
         perl = applyFalloff( curve2Tex(PerlinTex(1000, 2.5f, new Vector2(Random.Range(0, 10000), Random.Range(0, 10000))), TerrainCurve));
         rivers = applyFalloff( curve2Tex(SinglePerlin(1000, 13, new Vector2(Random.Range(0, 10000), Random.Range(0, 10000)), 0.8f), RiverCurve),rivFalloff:true);
+
+        // recreate maps until we find one that has
+        // above 1.5% mountains
+        // between 22% and 50% water
          MR = rateMap(perl, 0.07f, 0.5f);
         while ((MR.highPer > 0.015f && MR.waterPer > 0.22 && MR.waterPer < 0.5f&&MR.maxed<30) == false)
         {
             perl =applyFalloff( curve2Tex(PerlinTex(1000, 2.5f, new Vector2(Random.Range(0, 10000), Random.Range(0, 10000))), TerrainCurve));
             MR = rateMap(perl, 0.07f, 0.5f);
         }
+
+        // combine these textures and apply more river noise
         combo = avgTex(perl, rivers);
         riv2 = rivAddition(rivers, perl);
         riv3 = rivAddition2(rivers,perl);
     }
-    
-    Texture2D makeFalloff() { 
+
+
+    // falloff for normal heightmap
+    private Texture2D makeFalloff() { 
         Vector2 O = new Vector2(500, 500);
         Color[] cols = new Color[1000 * 1000];
         for (int y = 0; y <1000; y++) {
@@ -88,7 +97,8 @@ public class NoiseGen : MonoBehaviour
         return tex;
     }
 
-    Texture2D makeRivFalloff()
+    // falloff for river map as it uses a seperate function
+    private Texture2D makeRivFalloff()
     {
         Vector2 O = new Vector2(500, 500);
         Color[] cols = new Color[1000 * 1000];
@@ -116,7 +126,8 @@ public class NoiseGen : MonoBehaviour
     }
 
 
-    Texture2D rivAddition(Texture2D tex,Texture2D perl)
+    // 1st set of river noise
+    private Texture2D rivAddition(Texture2D tex,Texture2D perl)
     {
         Texture2D nTex=new Texture2D(1000, 1000);
         float thresh=0.02f;
@@ -134,7 +145,9 @@ public class NoiseGen : MonoBehaviour
         nTex.Apply();
         return nTex;
     }
-    Texture2D rivAddition2(Texture2D tex, Texture2D perl)
+
+    // 2nd set of river noise 
+    private Texture2D rivAddition2(Texture2D tex, Texture2D perl)
     {
         Texture2D nTex = new Texture2D(1000, 1000);
        // float thresh = 0.02f;
@@ -150,7 +163,10 @@ public class NoiseGen : MonoBehaviour
         nTex.Apply();
         return nTex;
     }
-    MapRating rateMap(Texture2D tex,float waterHeight, float highHeight)
+
+
+    // rate each map for its % of water % of mountains etc
+    private MapRating rateMap(Texture2D tex,float waterHeight, float highHeight)
     {
         int waterCount=0;
         int highCount=0;
@@ -175,6 +191,7 @@ public class NoiseGen : MonoBehaviour
     }
 
 
+    // create perlin tex with only 1 octave 
    public Texture2D SinglePerlin(int size, float scale, Vector2 offset,float amplitude)
     {
         float[] octaveFrequencies = new float[] {scale};
@@ -197,7 +214,9 @@ public class NoiseGen : MonoBehaviour
         return tex;
     }
 
-    Texture2D PerlinTex(int size,float scale,Vector2 offset)
+
+    // create a perlin noise texture with adjustable scale and random offset
+    private Texture2D PerlinTex(int size,float scale,Vector2 offset)
     {
         float[] octaveFrequencies = new float[] {2f, 5.5f, 11.5f, 23 };
         float[] octaveAmplitudes = new float[] { 0.9f, 0.15f, 0.1f, 0.05f };
@@ -220,6 +239,9 @@ public class NoiseGen : MonoBehaviour
         tex.Apply();
         return tex;
     }
+
+
+    // apply an animation curve to modify values of texture
     public Texture2D curve2Tex(Texture2D tex,AnimationCurve cur)
     {
         Color[] cols = tex.GetPixels();
@@ -233,7 +255,9 @@ public class NoiseGen : MonoBehaviour
         return tex;
     }
 
-    Texture2D applyFalloff(Texture2D tex,bool rivFalloff=false)
+
+    // apply falloff map to edges of texture
+    private Texture2D applyFalloff(Texture2D tex,bool rivFalloff=false)
     {
         Color[] col1=tex.GetPixels();
         Color[] col2;
@@ -251,7 +275,9 @@ public class NoiseGen : MonoBehaviour
         nTex.Apply();
         return nTex;
     }
-    Texture2D avgTex(Texture2D tex1,Texture2D tex2)
+
+    // combine 2 textures into an average
+    private Texture2D avgTex(Texture2D tex1,Texture2D tex2)
     {
         Color[] col1=tex1.GetPixels();
         Color[] col2=tex2.GetPixels();
@@ -262,8 +288,7 @@ public class NoiseGen : MonoBehaviour
 
             float val = (col1[i].r-(col2[i].r*0.12f*riverHeightCurve.Evaluate(col1[i].r)  ))   *fO[i].r; // minuses river map (rivers made less effectove at higher hiehgts) then muiltiply on falloff map
             col1[i]=new Color(val,val,val);
-          //  float rivval = 1-(col2[i].r * 0.09f * (0.6f - col1[i].r));
-          //  col2[i]=new Color(rivval, rivval, rivval);
+      
         }
         tex.SetPixels(col1);
         tex.Apply();

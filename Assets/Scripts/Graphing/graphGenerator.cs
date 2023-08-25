@@ -1,22 +1,19 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
-using System.Linq;
 
 
-public class graphTest : MonoBehaviour
+// This script creates the graph that shows statistics at the end
+public class graphGenerator: MonoBehaviour
 {
     public bool onIt;
-
     public Vector2 startP;
     public Vector2 scale;
 
     public float[] points;
     public GameObject pointPre;
     public GameObject linePre;
-
     public Transform place;
 
     public Color col;
@@ -26,7 +23,8 @@ public class graphTest : MonoBehaviour
     public Text peakText;
     public float peak;
     public Text hourMark;
-   // public StreamReader SR;
+
+
     void Start()
     {
         redoData();
@@ -37,9 +35,13 @@ public class graphTest : MonoBehaviour
     {
        
     }
+
+    // this script reads the csv file for each animal and imports the data
     public void redoData()
     {
         string fileName = Application.dataPath + @"\AnimalData\" + myAnimal.options[myAnimal.value].text + ".csv";
+
+        // depending on what characteristic set the max possible value
         switch (myAttr.value)
         {
             case 0:
@@ -85,38 +87,55 @@ public class graphTest : MonoBehaviour
 
 
         }
+
+
         peakText.text = peak.ToString();
         TextReader TR = new StreamReader(fileName, true);
         List<float> temp = new List<float>();
-        // temp.Add("abc");
+        
         string line;
         // Read and display lines from the file until the end of
         // the file is reached.
         line = TR.ReadLine();
         while ((line = TR.ReadLine()) != null)
         {
-          //  print((line.Split(',')[myAttr.value + 1]));
             temp.Add(100f * ((float.Parse(line.Split(',')[myAttr.value + 1])) / peak));
         }
         points = temp.ToArray();
         TR.Close();
+
+
+
+         // get how many hours there are
         hourMark.text = points.Length.ToString();
-        //GRAPH 
+
+
+        //create graph iteslf 
         onIt = false;
+        // destroy old markers
         foreach (Transform child in place)
         {
             GameObject.Destroy(child.gameObject);
         }
-        float intervals = scale.x / (points.Length - 1);
+
+
+        float intervals = scale.x / (points.Length - 1); // calculate interaval size
         for (int i = 0; i < points.Length; i++)
         {
+            // for line gradients calculate 2 adjacent points
             Vector2 thisPoint = startP + new Vector2(i * intervals, (points[i] / 100f) * scale.y);
             Vector2 nextPoint = Vector2.zero;
-            if (i != points.Length - 1)
+
+
+            if (i != points.Length - 1)// up to the n-1 th point
             {
+
+                // create a line using y=mx+c 
                 nextPoint = startP + new Vector2((i + 1) * intervals, (points[i + 1] / 100f) * scale.y);
                 float dis = Vector2.Distance(thisPoint, nextPoint);
                 float ang = Mathf.Rad2Deg * Mathf.Atan2(nextPoint.y - thisPoint.y, nextPoint.x - thisPoint.x);
+
+                // instatniate line prefab and set it to correct location and position and length
                 GameObject tempLine = Instantiate(linePre);
                 tempLine.transform.localScale = new Vector3(dis, 3, 0);
                 tempLine.transform.eulerAngles = new Vector3(0, 0, ang);
@@ -124,14 +143,14 @@ public class graphTest : MonoBehaviour
                 tempLine.transform.SetParent(place);
                 tempLine.GetComponentInChildren<Image>().color = col;
             }
-            
-                GameObject temp1 = Instantiate(pointPre);
 
-                temp1.transform.localPosition = thisPoint;
-                temp1.GetComponentInChildren<Image>().color = new Color(col.r * 0.8f, col.g * 0.8f, col.b * 0.8f);
-                temp1.GetComponentInChildren<pointData>().data=(peak/100f)*points[i];
-                temp1.GetComponentInChildren<pointData>().hours=i;
-                temp1.transform.SetParent(place);
+            // instantiate the dot for each hour too
+            GameObject temp1 = Instantiate(pointPre);
+            temp1.transform.localPosition = thisPoint;
+            temp1.GetComponentInChildren<Image>().color = new Color(col.r * 0.8f, col.g * 0.8f, col.b * 0.8f);
+            temp1.GetComponentInChildren<pointData>().data=(peak/100f)*points[i];
+            temp1.GetComponentInChildren<pointData>().hours=i;
+            temp1.transform.SetParent(place);
             
             
         }
@@ -139,4 +158,3 @@ public class graphTest : MonoBehaviour
 }
 
 
-//boomerang

@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+// markers map out where water/ food is so animals can use colliders to find
 public class markerController : MonoBehaviour
 {
     public Vector2 nearWater;

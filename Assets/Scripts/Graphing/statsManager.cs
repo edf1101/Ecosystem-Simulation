@@ -4,20 +4,29 @@ using UnityEngine;
 using System.Linq;
 using System.IO;
 
+// This script is run in the game scene and collects data on the animals each game hour
+
 public class statsManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    // script references
     public populationManager PM;
-    public Transform animalHolder;
     public timeController TC;
 
+    // where all teh animals are help
+    public Transform animalHolder;
+    
 
-    float lastCheck;
 
+    private float lastCheck;
 
+    // dict holding stats for each species
     public Dictionary<string, animalStats> statsDict = new Dictionary<string, animalStats>();
+
+
     void Start()
     {
+        // create a stats class for each species in the dict
+
         statsDict.Add("Arctic Fox", new animalStats("Arctic Fox"));
         statsDict.Add("Arctic Rabbit", new animalStats("Arctic Rabbit"));
         statsDict.Add("Desert Rabbit", new animalStats("Desert Rabbit"));
@@ -36,15 +45,18 @@ public class statsManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (TC.timeHours - lastCheck > 1)
+        if (TC.timeHours - lastCheck > 1) // each game hour update the statistics
         {
             lastCheck = TC.timeHours;
+            // go through each animal
             foreach( Transform child in animalHolder)
             {
+                // add its current characteristics to the species stats controller
                 animalController AC = child.GetComponent<animalController>();
                 statsDict[AC.speciesName].addData(AC.minTemp, AC.maxTemp, AC.baseSpeed, child.GetComponent<AnimalCreator>().generation, AC.aggression, AC.chanceAtt1D, AC.chanceAtt2D, PM.getAnimalPop(AC.speciesName),AC.faunaMul,PM.getKPS(AC.speciesName),PM.getBPS(AC.speciesName) ,AC.nearbyPrey,PM.popCount );
             }
 
+            // update the data for each species
             for (int i = 0; i < 13; i++)
             {
                 statsDict[PM.animals[i]].updateData();
@@ -57,6 +69,7 @@ public class statsManager : MonoBehaviour
 
     }
 
+    // for each species export a csv for it
     public void exportStats()
     {
         for (int i = 0; i < 13; i++)
@@ -66,11 +79,12 @@ public class statsManager : MonoBehaviour
     }
 }
 
-
+// class for statistics
 public class animalStats{
 
     public string Species = "";
 
+    // This holds the average data by hour for the species
     public List<int> popByTime = new List<int>();
     public List<float> minTByTime = new List<float>();
     public List<float> maxTByTime = new List<float>();
@@ -85,7 +99,8 @@ public class animalStats{
     public List<float> nPByTime = new List<float>();
     public List<float> tPByTime = new List<float>();
 
-
+    // this holds the cumulative data for the current hour. So the animal adds their
+    // data to it each hour then it gets averaged and sent to the above lists
     public int cPop = 0;
     public List<float> cMinT = new List<float>();
     public List<float> cMaxT = new List<float>();
@@ -102,10 +117,12 @@ public class animalStats{
 
 
 
-    public animalStats(string _spec)
+    public animalStats(string _spec) // constructor
     {
         Species = _spec;
     }
+
+    // add to the cumulatve lists
     public void addData(float _cMinT,float _cMaxT, float _cSpeed,float _cGen ,float _cAgg,float _cD1,float _cD2,int _cPop,float _cFM,int _cKPS, float _cDPS,int _cNP,int _cTPop)
     {
         cMinT.Add(_cMinT);
@@ -125,6 +142,7 @@ public class animalStats{
 
     }
 
+    // add cumuative averages to the main lists
     public void updateData()
     {
         popByTime.Add(cPop);
@@ -141,22 +159,25 @@ public class animalStats{
         nPByTime.Add(cNP.Average());
         tPByTime.Add(cTPop);
     }
+
+    // exports a csv of this species alone
     public void exportCSV()
     {
 
         string fileName = Application.dataPath + @"\AnimalData\" + Species + ".csv";
+
+        // check the directory exists else make one
         if (!Directory.Exists(Application.dataPath + @"\AnimalData\"))
             Directory.CreateDirectory(Application.dataPath + @"\AnimalData\");
+
+
+        //create the file
         TextWriter TW = new StreamWriter(fileName, false);
         TW.WriteLine("Hours,Pop,MinT,MaxT,Speed,Gen,Agg,D1,D2,FM,KPS,BPS,nPrey,TotPop");
         TW.Close();
 
-        Debug.Log(popByTime.Count);
-        Debug.Log(minTByTime.Count);
-        Debug.Log(speedByTime.Count);
-        Debug.Log(aggByTime.Count);
         TW = new StreamWriter(fileName, true);
-
+        // start adding in all the data to the csv
         for(int i=0; i < popByTime.Count; i++)
         {
             TW.WriteLine(i.ToString() + "," + Mathf.RoundToInt(popByTime[i]).ToString() + "," +  minTByTime[i].ToString() + "," + maxTByTime[i].ToString() + "," + speedByTime[i].ToString() + "," + Mathf.RoundToInt(genByTime[i]).ToString() + "," + aggByTime[i].ToString() + "," + D1ByTime[i].ToString() + "," + D2ByTime[i].ToString()+","+FMByTime[i].ToString()+","+KPSByTime[i].ToString()+","+BPSByTime[i].ToString()+","+nPByTime[i].ToString()+","+tPByTime[i].ToString()  );

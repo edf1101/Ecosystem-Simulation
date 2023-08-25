@@ -1,8 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+// inspired by Seb Lagues video, not what I used in my end NEA but this is faster
+// so implemented here
 
 public class reqManager : MonoBehaviour
 {
