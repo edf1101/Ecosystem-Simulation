@@ -1,25 +1,28 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+// this script controls the menu 
 public class menuManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+   
     public bool menuOut=true;
     public timeController TC;
-    //  public fly Fly;
-    float lastMulti=1;
-    float menuX = -532;
-    int going = 0;
+    private float lastMulti=1;
+    private float menuX = -532;
+    private int going = 0;
     public RectTransform holder;
-    public fly FL;
-    [SerializeField] statsManager SM;
+    public playerController myPlayer;
+
+    [SerializeField] private statsManager SM;
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("Menu")&&!FL.Spectating)
+        // if menu button pressed then toggle whether its in or out
+        // also toggle mouse lock status
+        if (Input.GetButtonDown("Menu")&&!myPlayer.Spectating)
         {
             if (menuOut)
             {
@@ -41,6 +44,8 @@ public class menuManager : MonoBehaviour
             }
 
         }
+
+        // If going out then lerp its position onto screen
         if (going == 1)
         {
             menuX += 6000 * Time.deltaTime;
@@ -51,6 +56,7 @@ public class menuManager : MonoBehaviour
             }
             holder.localPosition = new Vector3(menuX, 0, 0);
         }
+        // If going in then lerp its position onto screen
         if (going == -1)
         {
             menuX -= 6000 * Time.deltaTime;
@@ -62,6 +68,11 @@ public class menuManager : MonoBehaviour
             holder.localPosition = new Vector3(menuX, 0, 0);
         }
     }
+
+
+
+    // public procedures that the buttons call
+
     public void quit()
     {
         Application.Quit();

@@ -1,16 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+// This script manages plant growth
 public class floraController : MonoBehaviour
 {
-    // Start is called before the first frame update 
+    
     Vector3 baseSize;
     public float size = 1;
     [SerializeField] float regrowMult = 1;
     [SerializeField] float eatableThresh=0.65f;
     public timeController TC;
     public bool owner;
+
+    //return whether a plant is big enought to be eatable
     public bool eatable
     {
         get { return size > eatableThresh; }
@@ -26,6 +27,7 @@ public class floraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // if smaller than size 1 regrow it 
         transform.localScale = baseSize * size;
         if (size < 1)
         {
@@ -35,6 +37,8 @@ public class floraController : MonoBehaviour
             size = 1;
 
     }
+
+    // set size to 0 when eaten
     public void Eat()
     {
         size = 0;

@@ -1,105 +1,80 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// This script maintains and returns lists of predators/ prey / mates around me
+
 public class animalSight : MonoBehaviour
 {
-    // Start is called before the first frame update
+
+    // Lists of animals near
     public GameObject[] Sees;
     public GameObject[] predators;
-    public Texture2D baseAvailibles;
-    float lastLooked;
-    public Texture2D cheapMoves;
     public GameObject[] prey;
     public GameObject[] mates;
-    // Update is called once per frame
+
+    public Texture2D baseAvailibles; // texture of availible locations
+    private float lastLooked;
+    public Texture2D cheapMoves;
+  
+
     void Update()
     {
-        if (Time.time - lastLooked > 0.4f)
+        if (Time.time - lastLooked > 0.4f) // each.4s update lists
         {
             lastLooked = Time.time;
             prey = getPrey();
             predators = getPredators();
-            //  mates = getMates();
         }
 
 
     }
+
+    // update the lists
     public void UpdatePrey()
     {
         prey = getPrey();
         predators = getPredators();
         mates = getMates();
     }
-    public Vector2[] getCheapMoves()
+
+
+    // get nearby predators
+    private GameObject[] getPredators()
     {
-        int detail = 20;
-        int tryLength = 5;
-        cheapMoves = new Texture2D(250, 250);
-        cheapMoves.SetPixels(baseAvailibles.GetPixels());
-        cheapMoves.Apply();
-        List<Vector2> cheaps = new List<Vector2>();
-        for (int ang = 0; ang < 360; ang += detail)
-        {
-            var dir = Quaternion.Euler(0, ang, 0) * new Vector3(transform.forward.x, 0, transform.forward.z);
-
-            for (float dis = 0; dis < tryLength; dis += 0.5f)
-            {
-                Vector2 Pos = new Vector2(transform.position.x, transform.position.z) + new Vector2((dir.normalized * dis).x, (dir.normalized * dis).z);
-                if (baseAvailibles.GetPixel((int)Pos.x, (int)Pos.y) != Color.black)
-                {
-                    cheapMoves.SetPixel((int)Pos.x, (int)Pos.y, Color.blue);
-                    cheaps.Add(Pos);
-                }
-                else
-                {
-                    break;
-                }
-
-            }
-
-
-
-        }
-        cheapMoves.SetPixel((int)transform.position.x, (int)transform.position.z, Color.white);
-        cheapMoves.Apply();
-        return cheaps.ToArray();
-    }
-
-
-    GameObject[] getPredators()
-    {
+        // find all colliders in 10m radius
         Collider[] collisions = Physics.OverlapSphere(transform.position, 10);
         List<GameObject> behinds = new List<GameObject>();
+
+        // go through each collider
         foreach (Collider col in collisions)
         {
             if (col.GetComponentInParent<animalController>() != null)// if it is an animal
             {
-
+                // if its above me in food chain
                 if (col.GetComponentInParent<animalController>().foodChain > GetComponent<animalController>().foodChain)
                     behinds.Add(col.GetComponentInParent<animalController>().gameObject);
-
-
-
             }
 
         }
         return behinds.ToArray();
-
-
     }
+
+    // get nearby mates
     public GameObject[] getMates()
     {
+        // find all colliders nearby
         Collider[] collisions = Physics.OverlapSphere(transform.position, GetComponent<animalController>().PM.getRange(GetComponent<animalController>().speciesName));
         List<GameObject> mates = new List<GameObject>();
+
+        // go through each collider
         foreach (Collider col in collisions)
         {
             if (col.GetComponentInParent<animalController>() != null && col.GetComponentInParent<animalSight>() != this)// if it is an animal
             {
-
+                // if opposite gender and of age and same species then add them to mates list
                 if (col.GetComponentInParent<animalController>().canChild == 1 && col.GetComponentInParent<animalController>().age > GetComponent<animalController>().childWait && col.GetComponentInParent<animalController>().speciesName == GetComponent<animalController>().speciesName && col.GetComponentInParent<animalController>().male != GetComponent<animalController>().male)
                     mates.Add(col.GetComponentInParent<animalController>().gameObject);
-
-
 
             }
 
@@ -107,8 +82,11 @@ public class animalSight : MonoBehaviour
         return mates.ToArray();
 
     }
+
+    // get list of prey nearby
     public GameObject[] getPrey()
     {
+        // find nearby colliders
         Collider[] collisions = Physics.OverlapSphere(transform.position, 10);
         List<GameObject> behinds = new List<GameObject>();
         float chance2D = GetComponent<animalController>().chanceAtt2D;
@@ -116,11 +94,9 @@ public class animalSight : MonoBehaviour
         {
             if (col.GetComponentInParent<animalController>() != null)// if it is an animal
             {
-
+                // if below me in food chain add to list
                 if (col.GetComponentInParent<animalController>().foodChain == GetComponent<animalController>().foodChain-1 || (col.GetComponentInParent<animalController>().foodChain == GetComponent<animalController>().foodChain - 2 &&Random.value<chance2D))
                     behinds.Add(col.GetComponentInParent<animalController>().gameObject);
-
-
 
             }
 
